@@ -1,8 +1,28 @@
 # z-stack
 
-Proof-first workflows for [Claude Code](https://claude.com/claude-code). Show the change, don't describe it.
+Proof-first workflows for [Claude Code](https://claude.com/claude-code). Show the options before building, then show the change, don't describe it.
 
 ## Skills
+
+### `/z-stack:ui-demo`
+
+Mocks up a UI change before any product code is touched, so people pick the design instead of reading about it.
+
+1. Frames one open question and 2 to 4 options that differ in structure or behavior, each with trade-offs and a build cost in hours or days.
+2. Draws every option in one clickable HTML page, with the project's own tokens, copy and window size, next to a screenshot of the screen today.
+3. Checks every option in light and dark, and at phone width, before anyone sees it.
+4. Lets people choose: a question in the chat for one person, or a private Artifact with shared picks for a team.
+5. Iterates in rounds (`<slug>-r2.html`), then writes the pick down in `<slug>.decision.md` as the build brief.
+
+The page shell also runs on its own:
+
+```bash
+python3 plugins/z-stack/skills/ui-demo/scripts/scaffold.py \
+  --out docs/demos/settings-layout.html --title "Where Settings opens" \
+  --option "a|Sidebar swaps|The sidebar turns into the Settings list." \
+  --option "b|Tab with header|Settings opens in the card like any tab." \
+  --recommend a --baseline today.png
+```
 
 ### `/z-stack:evidence`
 
@@ -51,7 +71,7 @@ claude plugin marketplace add duolahypercho/z-stack
 claude plugin install z-stack@z-stack
 ```
 
-Then start a new session and run `/z-stack:evidence` or `/z-stack:pr-evidence`.
+Then start a new session and run `/z-stack:ui-demo`, `/z-stack:evidence` or `/z-stack:pr-evidence`.
 
 ## Layout
 
@@ -59,6 +79,8 @@ Then start a new session and run `/z-stack:evidence` or `/z-stack:pr-evidence`.
 .claude-plugin/marketplace.json     marketplace entry
 plugins/z-stack/
   .claude-plugin/plugin.json
+  skills/ui-demo/SKILL.md           options to pick from, before building
+  skills/ui-demo/scripts/           scaffold.py, template.html
   skills/evidence/SKILL.md          the workflow
   skills/evidence/scripts/evidence.py   report builder
   skills/pr-evidence/SKILL.md       proof on a PR
