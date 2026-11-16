@@ -6,8 +6,8 @@
     {
       "name": "z-stack",
       "source": "./plugins/z-stack",
-      "description": "Proof-first workflows. z-stack:evidence captures before and after screenshots of a change and builds a side-by-side report.",
-      "version": "0.1.0"
+      "description": "Proof-first workflows. z-stack:evidence captures before and after screenshots; z-stack:pr-evidence puts screenshots or charts from real measurements on a pull request.",
+      "version": "0.2.0"
     }
   ]
 }

@@ -24,6 +24,23 @@ python3 plugins/z-stack/skills/evidence/scripts/evidence.py \
 
 Pillow (`pip install pillow`) turns on the diff. Without it the report still builds.
 
+### `/z-stack:pr-evidence`
+
+Puts proof on a pull request, so a reviewer can trust it without checking out the branch.
+
+- **Visible change:** before and after screenshots, made with `/z-stack:evidence`.
+- **Change you measure** (speed, size, memory, failure rate): charts drawn from real runs on both sides. Every chart shows the median, the range of runs, the change in percent, and whether it moved the better way, the worse way, or stayed within noise. A regression is shown as plainly as a win.
+
+The images go on an orphan branch, `z-stack-evidence`, one folder per PR, so the PR branch never carries them. The skill then writes an `## Evidence` section for the PR body.
+
+```bash
+python3 plugins/z-stack/skills/pr-evidence/scripts/chart.py metrics.json --out ./.evidence/pr-42
+python3 plugins/z-stack/skills/pr-evidence/scripts/publish.py --dir ./.evidence/pr-42 --pr 42
+python3 plugins/z-stack/skills/pr-evidence/scripts/section.py --dir ./.evidence/pr-42 --pr 42 > evidence.md
+```
+
+`metrics.json` holds the raw samples and the command that made them. See the skill for the format.
+
 ## Install
 
 ```bash
@@ -34,7 +51,7 @@ claude plugin marketplace add duolahypercho/z-stack
 claude plugin install z-stack@z-stack
 ```
 
-Then start a new session and run `/z-stack:evidence`.
+Then start a new session and run `/z-stack:evidence` or `/z-stack:pr-evidence`.
 
 ## Layout
 
@@ -44,6 +61,8 @@ plugins/z-stack/
   .claude-plugin/plugin.json
   skills/evidence/SKILL.md          the workflow
   skills/evidence/scripts/evidence.py   report builder
+  skills/pr-evidence/SKILL.md       proof on a PR
+  skills/pr-evidence/scripts/       chart.py, publish.py, section.py
 ```
 
 ## License
