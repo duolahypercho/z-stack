@@ -1,0 +1,13 @@
+{
+  "name": "z-stack",
+  "owner": { "name": "duola" },
+  "metadata": { "description": "Proof-first agent workflows for Claude Code." },
+  "plugins": [
+    {
+      "name": "z-stack",
+      "source": "./plugins/z-stack",
+      "description": "Proof-first workflows. z-stack:evidence captures before and after screenshots of a change and builds a side-by-side report.",
+      "version": "0.1.0"
+    }
+  ]
+}
