@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Write the shell of a z-stack:ui-demo page.
+"""Write the shell of a z-stack:ui-demo site.
 
-One self-contained HTML file: an option switcher, a trade-off note per option,
-light and dark, a stage drawn at the app's window size, and a Pick panel.
-Each option gets an empty render function to fill in by hand.
+One self-contained HTML file that shows every design at once: all side by side
+with a "How they differ" table, two compared side by side or with a slider, and
+one at a time. Light and dark, each design drawn at the app's window size, and
+a Pick panel. Each option gets an empty render function to fill in by hand.
 """
 import argparse
 import base64
@@ -11,13 +12,14 @@ import html
 import json
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 TEMPLATE = Path(__file__).with_name("template.html")
 MIN_OPTIONS, MAX_OPTIONS = 2, 4
 MAX_BASELINE_BYTES = 4 * 1024 * 1024
 DEFAULT_SANS = 'ui-sans-serif, -apple-system, "SF Pro Text", system-ui, sans-serif'
-DEFAULT_SUBTITLE = "Click through each option, try light and dark, then pick the one to build."
+DEFAULT_SUBTITLE = "Every design on one page. Click inside them, compare two, try light and dark, then pick the one to build."
 IMAGE_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp"}
 THEMES = {"both": ["dark", "light"], "dark": ["dark"], "light": ["light"]}
 
@@ -34,7 +36,7 @@ def parse_option(text):
     option_id, name, idea = parts
     if not re.fullmatch(r"[a-z]", option_id):
         fail(f"option id must be one lower-case letter (a, b, c, d), got {option_id!r}")
-    return {"id": option_id, "name": name, "idea": idea, "points": [], "cost": ""}
+    return {"id": option_id, "name": name, "idea": idea, "points": [], "cost": "", "traits": {}}
 
 
 def parse_size(text):
@@ -70,23 +72,30 @@ def render_stub(option):
     )
 
 
-def baseline_js(path):
-    if path is None:
-        return ""
+def read_image(path, flag):
     if not path.is_file():
-        fail(f"--baseline {path} not found")
+        fail(f"{flag} {path} not found")
     mime = IMAGE_TYPES.get(path.suffix.lower())
     if mime is None:
-        fail(f"--baseline must be one of {', '.join(IMAGE_TYPES)}, got {path.suffix}")
+        fail(f"{flag} must be one of {', '.join(IMAGE_TYPES)}, got {path.suffix}")
     data = path.read_bytes()
     if len(data) > MAX_BASELINE_BYTES:
-        fail(f"--baseline is {len(data) // 1024} KB; keep it under {MAX_BASELINE_BYTES // 1024} KB (capture at 1x or crop)")
-    encoded = base64.b64encode(data).decode("ascii")
+        fail(f"{flag} is {len(data) // 1024} KB; keep it under {MAX_BASELINE_BYTES // 1024} KB (capture at 1x or crop)")
+    return f"data:{mime};base64,{base64.b64encode(data).decode('ascii')}"
+
+
+def baseline_js(images):
+    """images: {"any" | "dark" | "light": Path}. Today shows the one for the current theme."""
+    if not images:
+        return ""
+    flags = {"any": "--baseline", "dark": "--baseline-dark", "light": "--baseline-light"}
+    uris = {key: read_image(path, flags[key]) for key, path in images.items()}
     return (
-        "\n// Today: the current screen, captured before any option was drawn.\n"
-        f'const BASELINE = "data:{mime};base64,{encoded}";\n'
+        "\n// Today: the current screen, captured before any design was drawn, per theme when there are two.\n"
+        f"const BASELINE = {json.dumps(uris)};\n"
         "function render_today() {\n"
-        '  return `<img class="baseline" src="${BASELINE}" alt="Today: the current screen">`;\n'
+        "  const src = BASELINE[document.documentElement.dataset.theme] || BASELINE.any || Object.values(BASELINE)[0];\n"
+        '  return `<img class="baseline" src="${src}" alt="Today: the current screen">`;\n'
         "}\n"
     )
 
@@ -118,19 +127,25 @@ def build(args):
         for option in options:
             option["recommended"] = option["id"] == args.recommend
 
+    images = {key: path for key, path in
+              (("any", args.baseline), ("dark", args.baseline_dark), ("light", args.baseline_light)) if path}
     all_options = list(options)
-    if args.baseline:
+    if images:
         all_options.insert(0, {"id": "today", "name": "Today", "idea": "What ships now.",
-                               "points": [], "cost": "Nothing to build."})
+                               "points": [], "cost": "Nothing to build.", "traits": {}})
 
     font_link, sans = font_parts(args.font)
     size = parse_size(args.size)
-    demo = {"title": args.title, "slug": slugify(args.title), "size": size, "themes": THEMES[args.themes]}
+    if args.round < 1:
+        fail(f"--round must be 1 or more, got {args.round}")
+    demo = {"title": args.title, "slug": slugify(args.title), "size": size, "themes": THEMES[args.themes],
+            "round": args.round, "date": date.today().isoformat()}
     render_map = ", ".join(f"{option['id']}: render_{option['id']}" for option in all_options)
 
     replacements = {
         "{{NAME}}": html.escape(args.name or args.title),
         "{{TITLE}}": html.escape(args.title),
+        "{{ROUND}}": str(args.round),
         "{{SUBTITLE}}": html.escape(args.subtitle),
         "{{FONT_LINK}}": font_link,
         "{{SANS}}": sans,
@@ -138,7 +153,7 @@ def build(args):
         "{{H}}": str(size["h"]),
         "{{DEMO_JSON}}": js_literal(demo),
         "{{OPTIONS_JSON}}": js_literal(all_options),
-        "{{BASELINE_JS}}": baseline_js(args.baseline),
+        "{{BASELINE_JS}}": baseline_js(images),
         "{{RENDERS}}": "\n\n".join(render_stub(option) for option in options),
         "{{RENDER_MAP}}": render_map,
     }
@@ -164,6 +179,9 @@ def main():
     parser.add_argument("--themes", choices=sorted(THEMES), default="both")
     parser.add_argument("--font", help="Google Fonts family the project uses, e.g. Geist")
     parser.add_argument("--baseline", type=Path, help="screenshot of the screen today, shown first as 'Today'")
+    parser.add_argument("--baseline-dark", type=Path, help="today in dark, when the project has both themes")
+    parser.add_argument("--baseline-light", type=Path, help="today in light, when the project has both themes")
+    parser.add_argument("--round", type=int, default=1, help="iteration number shown in the masthead")
     parser.add_argument("--force", action="store_true", help="overwrite an existing file")
     args = parser.parse_args()
 
@@ -178,7 +196,7 @@ def main():
 
     stubs = ", ".join(f"render_{option['id']}()" for option in options)
     print(f"wrote {args.out} ({len(page) // 1024} KB, {len(options)} options)")
-    print(f"next: draw {stubs}; fill points and cost in OPTIONS; swap the placeholder tokens for the project's")
+    print(f"next: draw {stubs}; fill points, cost and traits in OPTIONS; swap the placeholder tokens for the project's")
     print(f"done when: grep -c data-todo {args.out} prints 0")
 
 
