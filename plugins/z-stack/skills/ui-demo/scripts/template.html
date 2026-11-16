@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{NAME}}</title>
+{{FONT_LINK}}
+<style>
+/* z-stack:ui-demo · {{TITLE}}
+   Tokens below are neutral placeholders. Replace them with the project's own
+   (docs/DESIGN.md, a theme or tokens file). Keep the two dark blocks identical. */
+:root {
+  --page-bg: #ECECEC; --window: #F4F4F4; --surface: #FCFCFC; --raised: #FFFFFF;
+  --ink: #1C1C1C; --secondary: #616161; --faint: #767676; --accent: #126FD4;
+  --line: rgba(28,28,28,.12); --hairline: rgba(28,28,28,.07); --strong: rgba(28,28,28,.24);
+  --hover: rgba(28,28,28,.045); --selected: rgba(28,28,28,.075); --track: rgba(28,28,28,.06);
+  --solid: #1C1C1C; --on-solid: #FCFCFC;
+  --win-shadow: 0 0 0 1px rgba(28,28,28,.10), 0 30px 60px -30px rgba(0,0,0,.45);
+  --sans: {{SANS}};
+  --radius: 12px; --ease: cubic-bezier(.16,1,.3,1); --fast: 150ms; --normal: 300ms;
+  --win-w: {{W}}px; --win-h: {{H}}px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --page-bg: #070707; --window: #0D0D0D; --surface: #141414; --raised: #1F1F1F;
+  --ink: #F5F5F5; --secondary: #A8A8A8; --faint: #8D8D8D; --accent: #1E87F6;
+  --line: rgba(245,245,245,.10); --hairline: rgba(245,245,245,.06); --strong: rgba(245,245,245,.22);
+  --hover: rgba(245,245,245,.05); --selected: rgba(245,245,245,.09); --track: rgba(245,245,245,.06);
+  --solid: #F5F5F5; --on-solid: #121212;
+  --win-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 30px 60px -30px rgba(0,0,0,.85);
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --page-bg: #070707; --window: #0D0D0D; --surface: #141414; --raised: #1F1F1F;
+  --ink: #F5F5F5; --secondary: #A8A8A8; --faint: #8D8D8D; --accent: #1E87F6;
+  --line: rgba(245,245,245,.10); --hairline: rgba(245,245,245,.06); --strong: rgba(245,245,245,.22);
+  --hover: rgba(245,245,245,.05); --selected: rgba(245,245,245,.09); --track: rgba(245,245,245,.06);
+  --solid: #F5F5F5; --on-solid: #121212;
+  --win-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 30px 60px -30px rgba(0,0,0,.85);
+  color-scheme: dark;
+}
+
+/* ---- Shell: the chooser around the mock ---- */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--page-bg); color: var(--ink); font: 13px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.page { max-width: 1240px; margin: 0 auto; padding: 24px 16px 56px; display: grid; gap: 16px; }
+
+.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; }
+.top h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+.top p { margin: 4px 0 0; color: var(--secondary); max-width: 62ch; }
+.ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--track); border-radius: 16px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; color: var(--secondary); font-weight: 500; font-size: 12px;
+  padding: 6px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center;
+  transition: background var(--fast), color var(--fast); }
+.seg button:hover { color: var(--ink); }
+.seg button:active { transform: translateY(1px); }
+.seg button[aria-pressed="true"] { background: var(--raised); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.seg .rec { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.seg[hidden] { display: none; }
+
+.note { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline;
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px 16px; }
+.note .tag { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+.note .tag.plain { color: var(--faint); }
+.note b { font-weight: 600; }
+.note .idea, .note ul, .note .cost { grid-column: 2; color: var(--secondary); }
+.note ul { margin: 6px 0 0; padding-left: 18px; }
+.note .cost { font-size: 12px; }
+.note .missing { color: var(--faint); font-style: italic; }
+
+.stage { position: relative; width: 100%; overflow: hidden; border-radius: 14px; }
+.scaler { width: var(--win-w); height: var(--win-h); transform-origin: top left; }
+.win { width: var(--win-w); height: var(--win-h); background: var(--window); border-radius: var(--radius);
+  overflow: hidden; display: flex; position: relative; box-shadow: var(--win-shadow); }
+.win > .baseline { width: 100%; height: 100%; object-fit: contain; background: var(--window); }
+.todo { flex: 1; margin: 24px; border: 1.5px dashed var(--strong); border-radius: var(--radius);
+  display: grid; place-content: center; gap: 6px; text-align: center; font-size: 18px; font-weight: 600; color: var(--secondary); }
+.todo small { font-size: 12px; font-weight: 400; color: var(--faint); }
+
+.pick { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: var(--radius); padding: 14px 16px; }
+.pick form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pick input { flex: 1 1 240px; min-width: 0; background: var(--raised); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; }
+.pick input::placeholder { color: var(--faint); }
+.pick .go { border: 0; background: var(--solid); color: var(--on-solid); font-weight: 600; padding: 8px 14px;
+  border-radius: 8px; cursor: pointer; transition: opacity var(--fast); }
+.pick .go:hover { opacity: .88; }
+.pick .go:active { transform: translateY(1px); }
+.pick .status { color: var(--secondary); font-size: 12px; min-height: 1em; overflow-wrap: anywhere; }
+.pick h2 { margin: 0; font-size: 12px; font-weight: 600; color: var(--faint); letter-spacing: .04em; text-transform: uppercase; }
+.pick ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.pick li { display: flex; flex-wrap: wrap; gap: 4px 10px; color: var(--secondary); }
+.pick li b { color: var(--ink); font-weight: 600; }
+
+.hint { color: var(--secondary); font-size: 12px; margin: 0; }
+kbd { font: 500 11px var(--sans); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---- The options' own styles go below this line ---- */
+
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="top">
+    <div>
+      <h1>{{TITLE}}</h1>
+      <p>{{SUBTITLE}}</p>
+    </div>
+    <div class="ctl">
+      <div class="seg" id="options" role="group" aria-label="Design option"></div>
+      <div class="seg" id="themes" role="group" aria-label="Theme">
+        <button type="button" data-theme-btn="dark" aria-pressed="false">Dark</button>
+        <button type="button" data-theme-btn="light" aria-pressed="false">Light</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="note" id="note" aria-live="polite"></section>
+
+  <div class="stage" id="stage"><div class="scaler" id="scaler"><div class="win" id="win"></div></div></div>
+
+  <section class="pick" aria-labelledby="pick-title">
+    <h2 id="pick-title">Pick one to build</h2>
+    <form id="pick-form">
+      <input id="pick-reason" maxlength="280" autocomplete="off" placeholder="Why this one? (optional)">
+      <button type="submit" class="go" id="pick-go">Pick</button>
+    </form>
+    <p class="status" id="pick-status" role="status"></p>
+    <ol id="pick-list" aria-label="Picks so far"></ol>
+  </section>
+
+  <p class="hint">Press <kbd>1</kbd> to <kbd id="last-key">4</kbd> to switch options. Sample data only.</p>
+</main>
+
+<script>
+"use strict";
+const DEMO = {{DEMO_JSON}};
+
+// Fill in `points` (2 or 3 trade-offs, the recommended option's downsides too) and `cost` for each option.
+const OPTIONS = {{OPTIONS_JSON}};
+
+// Add whatever state the options need (open panels, the selected page, a search query).
+const state = { option: OPTIONS[0].id, theme: "dark" };
+
+// Handlers for `data-act="name"` (click) and `data-input="name"` (typing) inside the mock.
+// Each runs, then the window re-renders. Example: ACTIONS.toggle = () => { state.open = !state.open; };
+const ACTIONS = {};
+{{BASELINE_JS}}
+// ---- Options: one function per option, returning the whole window's HTML ----
+
+{{RENDERS}}
+
+const RENDER = { {{RENDER_MAP}} };
+
+// ---- Picks ----
+// As written, a pick stays in this browser and is copied to paste back to Claude.
+// Publishing for a team? Replace submit() and list() with a shared store (z-stack:ui-demo, step 6).
+const CHOICE = {
+  async submit(pick) {
+    store.set("pick", pick);
+    const line = `Pick: ${pick.label}${pick.reason ? ` (${pick.reason})` : ""}`;
+    return (await copy(line)) ? "Copied. Paste it back to Claude." : line;
+  },
+  async list() {
+    const mine = store.get("pick");
+    return mine ? [{ ...mine, who: "You" }] : [];
+  },
+};
+
+// ---- Shell: no need to edit below ----
+const $ = (selector) => document.querySelector(selector);
+const esc = (text) => String(text ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const find = (id) => OPTIONS.find((option) => option.id === id);
+const label = (option) => (option.id === "today" ? "Today" : `${option.id.toUpperCase()} · ${option.name}`);
+const store = {
+  key: `z-stack-ui-demo:${DEMO.slug}`,
+  get(name) { try { return JSON.parse(localStorage.getItem(`${this.key}:${name}`)); } catch { return null; } },
+  set(name, value) { try { localStorage.setItem(`${this.key}:${name}`, JSON.stringify(value)); } catch { /* storage blocked: the copied line still carries the pick */ } },
+};
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
+}
+
+function renderSwitcher() {
+  $("#options").innerHTML = OPTIONS.map((option, index) =>
+    `<button type="button" data-opt="${option.id}" aria-pressed="${option.id === state.option}" aria-keyshortcuts="${index + 1}">${
+      option.recommended ? '<span class="rec" title="Recommended" aria-label="Recommended"></span>' : ""}${esc(label(option))}</button>`).join("");
+  $("#last-key").textContent = String(OPTIONS.length);
+}
+
+function renderNote(option) {
+  const tag = option.id === "today" ? "Today" : option.recommended ? "Recommended" : "Option";
+  const points = option.points.length
+    ? `<ul>${option.points.map((point) => `<li>${esc(point)}</li>`).join("")}</ul>`
+    : '<ul><li class="missing">Add 2 or 3 trade-offs in OPTIONS</li></ul>';
+  const cost = option.cost ? esc(option.cost) : '<span class="missing">Add the cost to build in OPTIONS</span>';
+  $("#note").innerHTML = `<span class="tag${option.recommended ? "" : " plain"}">${tag}</span><b>${esc(label(option))}</b>
+    <span class="idea">${esc(option.idea)}</span>${points}<span class="cost">${cost}</span>`;
+}
+
+function render() {
+  const option = find(state.option);
+  const focused = document.activeElement;
+  const keep = focused && $("#win").contains(focused) && focused.id
+    ? { id: focused.id, caret: focused.selectionStart ?? null } : null;
+  $("#win").innerHTML = RENDER[option.id]();
+  $("#win").dataset.option = option.id;
+  document.querySelectorAll("[data-opt]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.opt === option.id));
+  renderNote(option);
+  $("#pick-go").textContent = option.id === "today" ? "Keep today's design" : `Pick ${label(option)}`;
+  if (keep) {
+    const again = document.getElementById(keep.id);
+    if (again) { again.focus(); if (keep.caret !== null && again.setSelectionRange) again.setSelectionRange(keep.caret, keep.caret); }
+  }
+  syncUrl();
+}
+
+function select(id) {
+  if (!find(id)) return;
+  state.option = id;
+  render();
+}
+
+function setTheme(theme) {
+  state.theme = DEMO.themes.includes(theme) ? theme : DEMO.themes[0];
+  document.documentElement.dataset.theme = state.theme;
+  document.querySelectorAll("[data-theme-btn]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.themeBtn === state.theme));
+  syncUrl();
+}
+
+function syncUrl() {
+  try {
+    const url = new URL(location.href);
+    url.searchParams.set("option", state.option);
+    if (DEMO.themes.length > 1) url.searchParams.set("theme", state.theme);
+    history.replaceState(null, "", url);
+  } catch { /* sandboxed frame: the URL just doesn't follow along */ }
+}
+
+async function renderPicks() {
+  let picks = [];
+  try { picks = await CHOICE.list(); } catch (error) { $("#pick-status").textContent = `Couldn't load picks: ${error.message}`; }
+  const counts = OPTIONS.map((option) => [option, picks.filter((pick) => pick.option === option.id).length]).filter(([, n]) => n);
+  const summary = counts.map(([option, n]) => `<li><b>${esc(label(option))}</b><span>${n} ${n === 1 ? "pick" : "picks"}</span></li>`);
+  const reasons = picks.filter((pick) => pick.reason).map((pick) =>
+    `<li><b>${esc(pick.who || "Someone")}</b><span>${esc(pick.label)}: ${esc(pick.reason)}</span></li>`);
+  $("#pick-list").innerHTML = summary.concat(reasons).join("");
+}
+
+$("#pick-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const option = find(state.option);
+  const pick = { option: option.id, label: label(option), reason: $("#pick-reason").value.trim(), at: new Date().toISOString() };
+  try { $("#pick-status").textContent = await CHOICE.submit(pick); } catch (error) { $("#pick-status").textContent = `Pick not saved: ${error.message}`; }
+  renderPicks();
+});
+
+document.addEventListener("click", (event) => {
+  const el = event.target.closest("[data-opt],[data-theme-btn],[data-act]");
+  if (!el) return;
+  if (el.dataset.opt) return select(el.dataset.opt);
+  if (el.dataset.themeBtn) return setTheme(el.dataset.themeBtn);
+  const handler = ACTIONS[el.dataset.act];
+  if (!handler) return console.warn(`ui-demo: no ACTIONS.${el.dataset.act}`);
+  handler(el, event);
+  render();
+});
+document.addEventListener("input", (event) => {
+  const handler = ACTIONS[event.target.dataset?.input];
+  if (!handler) return;
+  handler(event.target, event);
+  render();
+});
+document.addEventListener("keydown", (event) => {
+  const typing = event.target instanceof Element && event.target.closest("input, textarea, select, [contenteditable]");
+  if (event.metaKey || event.ctrlKey || event.altKey || typing) return;
+  const option = OPTIONS[Number(event.key) - 1];
+  if (option) select(option.id);
+});
+
+function fit() {
+  const scale = Math.min(1, $("#stage").clientWidth / DEMO.size.w);
+  $("#scaler").style.transform = `scale(${scale})`;
+  $("#stage").style.height = `${DEMO.size.h * scale}px`;
+}
+
+(function start() {
+  const params = new URLSearchParams(location.search);
+  if (find(params.get("option"))) state.option = params.get("option");
+  $("#themes").hidden = DEMO.themes.length < 2;
+  const preferred = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  renderSwitcher();
+  setTheme(params.get("theme") || preferred);
+  render();
+  renderPicks();
+  new ResizeObserver(fit).observe($("#stage"));
+  fit();
+})();
+</script>
+</body>
+</html>

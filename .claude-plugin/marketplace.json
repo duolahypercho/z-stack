@@ -6,8 +6,8 @@
     {
       "name": "z-stack",
       "source": "./plugins/z-stack",
-      "description": "Proof-first workflows. z-stack:evidence captures before and after screenshots; z-stack:pr-evidence puts screenshots or charts from real measurements on a pull request.",
-      "version": "0.2.0"
+      "description": "Proof-first workflows. z-stack:ui-demo mocks up design options to pick from before building; z-stack:evidence captures before and after screenshots; z-stack:pr-evidence puts screenshots or charts from real measurements on a pull request.",
+      "version": "0.3.0"
     }
   ]
 }
