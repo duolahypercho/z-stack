@@ -10,95 +10,153 @@
    Tokens below are neutral placeholders. Replace them with the project's own
    (docs/DESIGN.md, a theme or tokens file). Keep the two dark blocks identical. */
 :root {
-  --page-bg: #ECECEC; --window: #F4F4F4; --surface: #FCFCFC; --raised: #FFFFFF;
-  --ink: #1C1C1C; --secondary: #616161; --faint: #767676; --accent: #126FD4;
+  --page-bg: #F3F3F1; --window: #F4F4F4; --surface: #FCFCFC; --raised: #FFFFFF;
+  --ink: #1C1C1C; --secondary: #5F5F63; --faint: #74747A; --accent: #126FD4;
   --line: rgba(28,28,28,.12); --hairline: rgba(28,28,28,.07); --strong: rgba(28,28,28,.24);
   --hover: rgba(28,28,28,.045); --selected: rgba(28,28,28,.075); --track: rgba(28,28,28,.06);
   --solid: #1C1C1C; --on-solid: #FCFCFC;
-  --win-shadow: 0 0 0 1px rgba(28,28,28,.10), 0 30px 60px -30px rgba(0,0,0,.45);
+  --win-shadow: 0 0 0 1px rgba(28,28,28,.10), 0 24px 48px -28px rgba(0,0,0,.40);
+  --card-shadow: 0 1px 0 rgba(0,0,0,.03), 0 12px 32px -22px rgba(0,0,0,.28);
+  --card-shadow-hover: 0 1px 0 rgba(0,0,0,.03), 0 18px 40px -20px rgba(0,0,0,.34);
   --sans: {{SANS}};
+  --mono: ui-monospace, "SF Mono", "Geist Mono", Menlo, monospace;
   --radius: 12px; --ease: cubic-bezier(.16,1,.3,1); --fast: 150ms; --normal: 300ms;
   --win-w: {{W}}px; --win-h: {{H}}px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --page-bg: #070707; --window: #0D0D0D; --surface: #141414; --raised: #1F1F1F;
-  --ink: #F5F5F5; --secondary: #A8A8A8; --faint: #8D8D8D; --accent: #1E87F6;
+  --page-bg: #09090A; --window: #0D0D0D; --surface: #141415; --raised: #1F1F1F;
+  --ink: #F5F5F5; --secondary: #A8A8AE; --faint: #8D8D94; --accent: #1E87F6;
   --line: rgba(245,245,245,.10); --hairline: rgba(245,245,245,.06); --strong: rgba(245,245,245,.22);
   --hover: rgba(245,245,245,.05); --selected: rgba(245,245,245,.09); --track: rgba(245,245,245,.06);
   --solid: #F5F5F5; --on-solid: #121212;
-  --win-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 30px 60px -30px rgba(0,0,0,.85);
+  --win-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 48px -28px rgba(0,0,0,.9);
+  --card-shadow: 0 0 0 1px rgba(255,255,255,.02), 0 12px 32px -22px rgba(0,0,0,.9);
+  --card-shadow-hover: 0 0 0 1px rgba(255,255,255,.04), 0 18px 40px -20px rgba(0,0,0,.95);
   color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --page-bg: #070707; --window: #0D0D0D; --surface: #141414; --raised: #1F1F1F;
-  --ink: #F5F5F5; --secondary: #A8A8A8; --faint: #8D8D8D; --accent: #1E87F6;
+  --page-bg: #09090A; --window: #0D0D0D; --surface: #141415; --raised: #1F1F1F;
+  --ink: #F5F5F5; --secondary: #A8A8AE; --faint: #8D8D94; --accent: #1E87F6;
   --line: rgba(245,245,245,.10); --hairline: rgba(245,245,245,.06); --strong: rgba(245,245,245,.22);
   --hover: rgba(245,245,245,.05); --selected: rgba(245,245,245,.09); --track: rgba(245,245,245,.06);
   --solid: #F5F5F5; --on-solid: #121212;
-  --win-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 30px 60px -30px rgba(0,0,0,.85);
+  --win-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 48px -28px rgba(0,0,0,.9);
+  --card-shadow: 0 0 0 1px rgba(255,255,255,.02), 0 12px 32px -22px rgba(0,0,0,.9);
+  --card-shadow-hover: 0 0 0 1px rgba(255,255,255,.04), 0 18px 40px -20px rgba(0,0,0,.95);
   color-scheme: dark;
 }
 
-/* ---- Shell: the chooser around the mock ---- */
+/* ---- Site: the frame around the options ---- */
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--page-bg); color: var(--ink); font: 13px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
-button, input, textarea { font: inherit; color: inherit; }
+html { scroll-padding-top: 76px; }
+body { background: var(--page-bg); color: var(--ink); font: 14px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+button, input, textarea, select { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.page { max-width: 1240px; margin: 0 auto; padding: 24px 16px 56px; display: grid; gap: 16px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.site { max-width: 1600px; margin: 0 auto; padding: clamp(24px, 4vw, 56px) 16px 80px; display: grid; gap: 24px; }
 
-.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; }
-.top h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
-.top p { margin: 4px 0 0; color: var(--secondary); max-width: 62ch; }
-.ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mast { display: grid; gap: 8px; border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
+.kicker { font: 500 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { margin: 0; font: 600 clamp(28px, 1rem + 2.6vw, 48px)/1.06 var(--sans); letter-spacing: -.025em; max-width: 26ch; }
+.lede { margin: 0; color: var(--secondary); max-width: 68ch; font-size: 15px; }
+.meta { font: 12px var(--mono); color: var(--faint); }
+
+.bar { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+  justify-content: space-between; margin: -12px -16px 0; padding: 10px 16px; background: var(--page-bg);
+  background: color-mix(in srgb, var(--page-bg) 86%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid var(--hairline); }
 .seg { display: inline-flex; flex-wrap: wrap; background: var(--track); border-radius: 16px; padding: 3px; gap: 2px; }
 .seg button { border: 0; background: transparent; color: var(--secondary); font-weight: 500; font-size: 12px;
   padding: 6px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center;
   transition: background var(--fast), color var(--fast); }
 .seg button:hover { color: var(--ink); }
 .seg button:active { transform: translateY(1px); }
-.seg button[aria-pressed="true"] { background: var(--raised); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.seg button[aria-pressed="true"], .seg button[aria-checked="true"] { background: var(--raised); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
 .seg .rec { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 .seg[hidden] { display: none; }
 
-.note { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline;
-  background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px 16px; }
-.note .tag { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
-.note .tag.plain { color: var(--faint); }
-.note b { font-weight: 600; }
-.note .idea, .note ul, .note .cost { grid-column: 2; color: var(--secondary); }
-.note ul { margin: 6px 0 0; padding-left: 18px; }
-.note .cost { font-size: 12px; }
-.note .missing { color: var(--faint); font-style: italic; }
+/* Cards: one design each */
+.grid { display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: 20px; align-items: start; }
+.card { display: grid; gap: 12px; align-content: start; background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: 16px; padding: 14px 14px 16px; box-shadow: var(--card-shadow); transition: box-shadow var(--normal) var(--ease); }
+.card:hover { box-shadow: var(--card-shadow-hover); }
+.card.rec { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.card-head h2 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+.letter { font: 600 12px var(--mono); min-width: 28px; height: 28px; padding: 0 7px; display: inline-grid; place-items: center;
+  border-radius: 8px; background: var(--ink); color: var(--page-bg); }
+.card[data-today] .letter { background: var(--track); color: var(--secondary); }
+.chip { font: 500 11px var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
+  background: var(--track); color: var(--secondary); }
+.chip.accent { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.idea { margin: 0; }
+.points { margin: 0; padding-left: 18px; color: var(--secondary); }
+.cost { margin: 0; font: 12px/1.5 var(--mono); color: var(--secondary); }
+.missing { color: var(--faint); font-style: italic; }
+.ghost { justify-self: start; border: 1px solid var(--line); background: transparent; border-radius: 8px; padding: 7px 12px;
+  font-weight: 500; cursor: pointer; transition: background var(--fast); }
+.ghost:hover { background: var(--hover); }
+.ghost:active { transform: translateY(1px); }
 
-.stage { position: relative; width: 100%; overflow: hidden; border-radius: 14px; }
+/* The window each design is drawn in, scaled to fit */
+.stage { position: relative; width: 100%; overflow: hidden; border-radius: var(--radius); }
 .scaler { width: var(--win-w); height: var(--win-h); transform-origin: top left; }
+.stage.slide .scaler { position: absolute; top: 0; left: 0; }
 .win { width: var(--win-w); height: var(--win-h); background: var(--window); border-radius: var(--radius);
   overflow: hidden; display: flex; position: relative; box-shadow: var(--win-shadow); }
 .win > .baseline { width: 100%; height: 100%; object-fit: contain; background: var(--window); }
 .todo { flex: 1; margin: 24px; border: 1.5px dashed var(--strong); border-radius: var(--radius);
   display: grid; place-content: center; gap: 6px; text-align: center; font-size: 18px; font-weight: 600; color: var(--secondary); }
 .todo small { font-size: 12px; font-weight: 400; color: var(--faint); }
+.slide .tag-l, .slide .tag-r { position: absolute; top: 10px; z-index: 2; font: 500 11px var(--mono); background: var(--ink);
+  color: var(--page-bg); padding: 2px 8px; border-radius: 6px; pointer-events: none; }
+.slide .tag-l { left: 10px; }
+.slide .tag-r { right: 10px; }
+.reveal { width: 100%; margin: 0; accent-color: var(--accent); }
 
-.pick { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--hairline);
-  border-radius: var(--radius); padding: 14px 16px; }
+/* Compare two */
+.compare, .focus { display: grid; gap: 16px; }
+.compare-ctl { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+.side-pick { display: inline-flex; gap: 8px; align-items: center; }
+.side-pick > span { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+
+/* How they differ */
+.traits { display: grid; gap: 10px; }
+.traits h2, .pick h2 { margin: 0; font: 600 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.table-scroll { overflow-x: auto; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); }
+.traits table { width: 100%; border-collapse: collapse; min-width: 560px; }
+.traits th, .traits td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--hairline); }
+.traits thead th { font: 500 12px var(--mono); color: var(--secondary); }
+.traits tbody th { font-weight: 500; color: var(--secondary); width: 18%; }
+.traits tr:last-child > * { border-bottom: 0; }
+.traits tr.same td { color: var(--faint); }
+.traits td.changed { font-weight: 500; }
+.traits td.changed::before, .legend .dot { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); margin: 0 8px 1px 0; vertical-align: middle; }
+.legend { margin: 0; font-size: 12px; color: var(--faint); }
+
+/* Pick */
+.pick { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--hairline); border-radius: 16px;
+  padding: 16px; box-shadow: var(--card-shadow); }
 .pick form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.pick input { flex: 1 1 240px; min-width: 0; background: var(--raised); border: 1px solid var(--line);
-  border-radius: 8px; padding: 8px 10px; }
+.pick input { flex: 1 1 240px; min-width: 0; background: var(--raised); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
 .pick input::placeholder { color: var(--faint); }
-.pick .go { border: 0; background: var(--solid); color: var(--on-solid); font-weight: 600; padding: 8px 14px;
-  border-radius: 8px; cursor: pointer; transition: opacity var(--fast); }
-.pick .go:hover { opacity: .88; }
-.pick .go:active { transform: translateY(1px); }
-.pick .status { color: var(--secondary); font-size: 12px; min-height: 1em; overflow-wrap: anywhere; }
-.pick h2 { margin: 0; font-size: 12px; font-weight: 600; color: var(--faint); letter-spacing: .04em; text-transform: uppercase; }
+.go { border: 0; background: var(--solid); color: var(--on-solid); font-weight: 600; padding: 8px 14px; border-radius: 8px;
+  cursor: pointer; transition: opacity var(--fast); }
+.go:hover { opacity: .88; }
+.go:active { transform: translateY(1px); }
+.status { margin: 0; color: var(--secondary); font-size: 12px; min-height: 1em; overflow-wrap: anywhere; }
 .pick ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
 .pick li { display: flex; flex-wrap: wrap; gap: 4px 10px; color: var(--secondary); }
 .pick li b { color: var(--ink); font-weight: 600; }
 
-.hint { color: var(--secondary); font-size: 12px; margin: 0; }
-kbd { font: 500 11px var(--sans); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
+.hint { color: var(--faint); font-size: 12px; margin: 0; }
+kbd { font: 500 11px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
 
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .pair { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
@@ -108,27 +166,31 @@ kbd { font: 500 11px var(--sans); border: 1px solid var(--line); border-bottom-w
 </style>
 </head>
 <body>
-<main class="page">
-  <header class="top">
-    <div>
-      <h1>{{TITLE}}</h1>
-      <p>{{SUBTITLE}}</p>
-    </div>
-    <div class="ctl">
-      <div class="seg" id="options" role="group" aria-label="Design option"></div>
-      <div class="seg" id="themes" role="group" aria-label="Theme">
-        <button type="button" data-theme-btn="dark" aria-pressed="false">Dark</button>
-        <button type="button" data-theme-btn="light" aria-pressed="false">Light</button>
-      </div>
-    </div>
+<main class="site">
+  <header class="mast">
+    <span class="kicker">z-stack:ui-demo · Round {{ROUND}}</span>
+    <h1>{{TITLE}}</h1>
+    <p class="lede">{{SUBTITLE}}</p>
+    <span class="meta" id="meta"></span>
   </header>
 
-  <section class="note" id="note" aria-live="polite"></section>
+  <nav class="bar" aria-label="Demo controls">
+    <div class="seg" role="group" aria-label="View">
+      <button type="button" data-view="all" aria-pressed="true">All side by side</button>
+      <button type="button" data-view="compare" aria-pressed="false">Compare two</button>
+      <button type="button" data-view="focus" aria-pressed="false">One at a time</button>
+    </div>
+    <div class="seg" id="themes" role="group" aria-label="Theme">
+      <button type="button" data-theme-btn="dark" aria-pressed="false">Dark</button>
+      <button type="button" data-theme-btn="light" aria-pressed="false">Light</button>
+    </div>
+  </nav>
 
-  <div class="stage" id="stage"><div class="scaler" id="scaler"><div class="win" id="win"></div></div></div>
+  <section id="view" aria-label="Designs"></section>
 
-  <section class="pick" aria-labelledby="pick-title">
+  <section class="pick" id="pick" aria-labelledby="pick-title">
     <h2 id="pick-title">Pick one to build</h2>
+    <div class="seg" id="pick-options" role="radiogroup" aria-label="Design to pick"></div>
     <form id="pick-form">
       <input id="pick-reason" maxlength="280" autocomplete="off" placeholder="Why this one? (optional)">
       <button type="submit" class="go" id="pick-go">Pick</button>
@@ -137,24 +199,30 @@ kbd { font: 500 11px var(--sans); border: 1px solid var(--line); border-bottom-w
     <ol id="pick-list" aria-label="Picks so far"></ol>
   </section>
 
-  <p class="hint">Press <kbd>1</kbd> to <kbd id="last-key">4</kbd> to switch options. Sample data only.</p>
+  <p class="hint">Keys <kbd>1</kbd> to <kbd id="last-key">4</kbd>: jump to a design, set the right side in Compare, or switch in One at a time. Sample data only.</p>
 </main>
 
 <script>
 "use strict";
 const DEMO = {{DEMO_JSON}};
 
-// Fill in `points` (2 or 3 trade-offs, the recommended option's downsides too) and `cost` for each option.
+// Fill in, for every option:
+//   points: 2 or 3 trade-offs (the recommended one's downsides too)
+//   cost:   the cost to build, in hours or days
+//   traits: 3 to 5 short answers to the same questions, same keys in every option,
+//           e.g. { "Where pages live": "Sidebar", "Steps to connect": "2" }. They fill "How they differ".
 const OPTIONS = {{OPTIONS_JSON}};
 
-// Add whatever state the options need (open panels, the selected page, a search query).
-const state = { option: OPTIONS[0].id, theme: "dark" };
+// State the options read. Each design is on the page more than once, and one change shows in all of
+// them, so people can open the same panel in every design at once.
+const state = {};
 
-// Handlers for `data-act="name"` (click) and `data-input="name"` (typing) inside the mock.
-// Each runs, then the window re-renders. Example: ACTIONS.toggle = () => { state.open = !state.open; };
+// Handlers for `data-act="name"` (click) and `data-input="name"` (typing) inside a design.
+// Each runs, then every design re-renders. Example: ACTIONS.toggle = () => { state.open = !state.open; };
+// Don't put `id`s inside designs: they appear several times. Use classes and data-* instead.
 const ACTIONS = {};
 {{BASELINE_JS}}
-// ---- Options: one function per option, returning the whole window's HTML ----
+// ---- Designs: one function per option, returning the whole window's HTML ----
 
 {{RENDERS}}
 
@@ -175,11 +243,14 @@ const CHOICE = {
   },
 };
 
-// ---- Shell: no need to edit below ----
+// ---- Site: no need to edit below ----
 const $ = (selector) => document.querySelector(selector);
 const esc = (text) => String(text ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const find = (id) => OPTIONS.find((option) => option.id === id);
+const short = (option) => (option.id === "today" ? "Today" : option.id.toUpperCase());
 const label = (option) => (option.id === "today" ? "Today" : `${option.id.toUpperCase()} · ${option.name}`);
+const pickLabel = (option) => (option.id === "today" ? "Keep today's design" : `Pick ${label(option)}`);
+const motion = () => (matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth");
 const store = {
   key: `z-stack-ui-demo:${DEMO.slug}`,
   get(name) { try { return JSON.parse(localStorage.getItem(`${this.key}:${name}`)); } catch { return null; } },
@@ -189,60 +260,168 @@ async function copy(text) {
   try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
 }
 
-function renderSwitcher() {
-  $("#options").innerHTML = OPTIONS.map((option, index) =>
-    `<button type="button" data-opt="${option.id}" aria-pressed="${option.id === state.option}" aria-keyshortcuts="${index + 1}">${
-      option.recommended ? '<span class="rec" title="Recommended" aria-label="Recommended"></span>' : ""}${esc(label(option))}</button>`).join("");
-  $("#last-key").textContent = String(OPTIONS.length);
-}
+const LEFT = (find("today") || OPTIONS[0]).id;
+const view = {
+  name: "all", theme: "dark", mode: "side", reveal: 50,
+  option: OPTIONS[0].id,
+  left: LEFT,
+  right: (OPTIONS.find((o) => o.recommended && o.id !== LEFT) || OPTIONS.find((o) => o.id !== LEFT)).id,
+  pick: (OPTIONS.find((o) => o.recommended) || OPTIONS.find((o) => o.id !== "today")).id,
+};
 
-function renderNote(option) {
-  const tag = option.id === "today" ? "Today" : option.recommended ? "Recommended" : "Option";
+// Pieces
+const stage = (id, slot) =>
+  `<div class="stage" data-stage><div class="scaler"><div class="win" data-option="${id}" data-slot="${slot}"></div></div></div>`;
+const pickButton = (option) => `<button type="button" class="ghost" data-pick="${option.id}">${esc(pickLabel(option))}</button>`;
+function head(option) {
+  return `<header class="card-head"><span class="letter">${short(option)}</span><h2>${esc(option.name)}</h2>${
+    option.recommended ? '<span class="chip accent">Recommended</span>' : ""}</header>`;
+}
+function about(option) {
+  const today = option.id === "today";
   const points = option.points.length
-    ? `<ul>${option.points.map((point) => `<li>${esc(point)}</li>`).join("")}</ul>`
-    : '<ul><li class="missing">Add 2 or 3 trade-offs in OPTIONS</li></ul>';
+    ? option.points.map((point) => `<li>${esc(point)}</li>`).join("")
+    : today ? "" : '<li class="missing">Add 2 or 3 trade-offs in OPTIONS</li>';
   const cost = option.cost ? esc(option.cost) : '<span class="missing">Add the cost to build in OPTIONS</span>';
-  $("#note").innerHTML = `<span class="tag${option.recommended ? "" : " plain"}">${tag}</span><b>${esc(label(option))}</b>
-    <span class="idea">${esc(option.idea)}</span>${points}<span class="cost">${cost}</span>`;
+  return `<p class="idea">${esc(option.idea)}</p>${points ? `<ul class="points">${points}</ul>` : ""}<p class="cost">${cost}</p>`;
+}
+function card(option, slot, withStage = true) {
+  return `<article class="card${option.recommended ? " rec" : ""}"${option.id === "today" ? " data-today" : ""}
+    id="card-${slot}-${option.id}" aria-label="${esc(label(option))}">${head(option)}${withStage ? stage(option.id, slot) : ""}${
+    about(option)}${pickButton(option)}</article>`;
 }
 
-function render() {
-  const option = find(state.option);
-  const focused = document.activeElement;
-  const keep = focused && $("#win").contains(focused) && focused.id
-    ? { id: focused.id, caret: focused.selectionStart ?? null } : null;
-  $("#win").innerHTML = RENDER[option.id]();
-  $("#win").dataset.option = option.id;
-  document.querySelectorAll("[data-opt]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.opt === option.id));
-  renderNote(option);
-  $("#pick-go").textContent = option.id === "today" ? "Keep today's design" : `Pick ${label(option)}`;
-  if (keep) {
-    const again = document.getElementById(keep.id);
-    if (again) { again.focus(); if (keep.caret !== null && again.setSelectionRange) again.setSelectionRange(keep.caret, keep.caret); }
+function traits() {
+  const keys = [...new Set(OPTIONS.flatMap((option) => Object.keys(option.traits || {})))];
+  const title = '<h2 id="traits-title">How they differ</h2>';
+  if (!keys.length) {
+    return `<section class="traits" aria-labelledby="traits-title">${title}<p class="missing">Add 3 to 5 traits to every option in OPTIONS, with the same keys.</p></section>`;
   }
+  const today = find("today");
+  const value = (option, key) => (option.traits && option.traits[key]) || "";
+  const rows = keys.map((key) => {
+    const values = OPTIONS.map((option) => value(option, key));
+    const same = values.every((v) => v === values[0]);
+    const cells = OPTIONS.map((option, i) => {
+      const changed = today && option !== today && !same && values[i] !== value(today, key);
+      return `<td${changed ? ' class="changed"' : ""}>${values[i] ? esc(values[i]) : '<span class="missing">Not filled</span>'}</td>`;
+    }).join("");
+    return `<tr${same ? ' class="same"' : ""}><th scope="row">${esc(key)}</th>${cells}</tr>`;
+  }).join("");
+  const legend = today
+    ? '<p class="legend"><span class="dot"></span>differs from today · grey rows are the same in every design</p>'
+    : '<p class="legend">Grey rows are the same in every design.</p>';
+  return `<section class="traits" aria-labelledby="traits-title">${title}<div class="table-scroll"><table>
+    <thead><tr><th scope="col"><span class="sr">Question</span></th>${OPTIONS.map((o) => `<th scope="col">${esc(label(o))}</th>`).join("")}</tr></thead>
+    <tbody>${rows}</tbody></table></div>${legend}</section>`;
+}
+
+// Views
+function buildAll() {
+  const cols = OPTIONS.length <= 3 ? OPTIONS.length : 2;
+  return `<div class="grid" style="--cols:${cols}">${OPTIONS.map((option) => card(option, "all")).join("")}</div>${traits()}`;
+}
+
+function buildCompare() {
+  const side = (name) => `<div class="side-pick"><span>${name}</span><div class="seg" role="group" aria-label="${name} design">${
+    OPTIONS.map((o) => `<button type="button" data-side="${name.toLowerCase()}" data-id="${o.id}" aria-pressed="${view[name.toLowerCase()] === o.id}">${esc(short(o))}</button>`).join("")}</div></div>`;
+  const modes = `<div class="seg" role="group" aria-label="Compare as">${[["side", "Side by side"], ["slide", "Slider"]].map(([mode, text]) =>
+    `<button type="button" data-mode="${mode}" aria-pressed="${view.mode === mode}">${text}</button>`).join("")}</div>`;
+  const left = find(view.left);
+  const right = find(view.right);
+  const body = view.mode === "slide"
+    ? `<div class="card"><div class="stage slide" data-stage>
+        <div class="scaler"><div class="win" data-option="${left.id}" data-slot="under"></div></div>
+        <div class="scaler over" style="clip-path: inset(0 0 0 ${view.reveal}%)"><div class="win" data-option="${right.id}" data-slot="over"></div></div>
+        <span class="tag-l">${esc(label(left))}</span><span class="tag-r">${esc(label(right))}</span></div>
+        <input type="range" class="reveal" min="0" max="100" value="${view.reveal}" aria-label="Drag to reveal ${esc(label(right))}"></div>
+      <div class="pair">${card(left, "left", false)}${card(right, "right", false)}</div>`
+    : `<div class="pair">${card(left, "left")}${card(right, "right")}</div>`;
+  return `<div class="compare"><div class="compare-ctl">${side("Left")}${side("Right")}${modes}</div>${body}</div>`;
+}
+
+function buildFocus() {
+  const option = find(view.option);
+  const switcher = `<div class="seg" role="group" aria-label="Design">${OPTIONS.map((o, i) =>
+    `<button type="button" data-opt="${o.id}" aria-pressed="${o.id === option.id}" aria-keyshortcuts="${i + 1}">${
+      o.recommended ? '<span class="rec" aria-label="Recommended"></span>' : ""}${esc(label(o))}</button>`).join("")}</div>`;
+  return `<div class="focus">${switcher}${card(option, "focus", false)}${stage(option.id, "focus")}</div>`;
+}
+
+// Drawing
+function fitStage(element) {
+  const scale = Math.min(1, element.clientWidth / DEMO.size.w);
+  element.querySelectorAll(".scaler").forEach((scaler) => { scaler.style.transform = `scale(${scale})`; });
+  element.style.height = `${DEMO.size.h * scale}px`;
+}
+const sizer = new ResizeObserver((entries) => entries.forEach((entry) => fitStage(entry.target)));
+
+function paint() {
+  const active = document.activeElement;
+  const from = active && active.closest ? active.closest(".win") : null;
+  const keep = from && active.dataset.input
+    ? { option: from.dataset.option, slot: from.dataset.slot, input: active.dataset.input, caret: active.selectionStart ?? null } : null;
+  document.querySelectorAll("#view .win[data-option]").forEach((win) => { win.innerHTML = RENDER[win.dataset.option](); });
+  if (!keep) return;
+  const again = $(`#view .win[data-option="${keep.option}"][data-slot="${keep.slot}"] [data-input="${CSS.escape(keep.input)}"]`);
+  if (!again) return;
+  again.focus();
+  if (keep.caret !== null && again.setSelectionRange) again.setSelectionRange(keep.caret, keep.caret);
+}
+
+function build() {
+  sizer.disconnect();
+  $("#view").innerHTML = { all: buildAll, compare: buildCompare, focus: buildFocus }[view.name]();
+  document.querySelectorAll("[data-view]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.view === view.name));
+  document.querySelectorAll("#view [data-stage]").forEach((element) => { fitStage(element); sizer.observe(element); });
+  paint();
+  renderPickOptions();
   syncUrl();
 }
 
-function select(id) {
-  if (!find(id)) return;
-  state.option = id;
-  render();
+function go(patch) {
+  Object.assign(view, patch);
+  build();
 }
 
 function setTheme(theme) {
-  state.theme = DEMO.themes.includes(theme) ? theme : DEMO.themes[0];
-  document.documentElement.dataset.theme = state.theme;
-  document.querySelectorAll("[data-theme-btn]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.themeBtn === state.theme));
+  view.theme = DEMO.themes.includes(theme) ? theme : DEMO.themes[0];
+  document.documentElement.dataset.theme = view.theme;
+  document.querySelectorAll("[data-theme-btn]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.themeBtn === view.theme));
+  paint();
   syncUrl();
 }
 
 function syncUrl() {
   try {
     const url = new URL(location.href);
-    url.searchParams.set("option", state.option);
-    if (DEMO.themes.length > 1) url.searchParams.set("theme", state.theme);
+    const params = {
+      view: view.name,
+      theme: DEMO.themes.length > 1 ? view.theme : null,
+      option: view.name === "focus" ? view.option : null,
+      left: view.name === "compare" ? view.left : null,
+      right: view.name === "compare" ? view.right : null,
+      mode: view.name === "compare" ? view.mode : null,
+    };
+    Object.entries(params).forEach(([key, value]) => (value ? url.searchParams.set(key, value) : url.searchParams.delete(key)));
     history.replaceState(null, "", url);
   } catch { /* sandboxed frame: the URL just doesn't follow along */ }
+}
+
+// Picks
+function renderPickOptions() {
+  $("#pick-options").innerHTML = OPTIONS.map((o) =>
+    `<button type="button" role="radio" data-pick-opt="${o.id}" aria-checked="${o.id === view.pick}">${esc(short(o))}</button>`).join("");
+  $("#pick-go").textContent = pickLabel(find(view.pick));
+}
+
+function choose(id, jump) {
+  if (!find(id)) return;
+  view.pick = id;
+  renderPickOptions();
+  if (!jump) return;
+  $("#pick").scrollIntoView({ block: "start", behavior: motion() });
+  $("#pick-reason").focus({ preventScroll: true });
 }
 
 async function renderPicks() {
@@ -257,52 +436,65 @@ async function renderPicks() {
 
 $("#pick-form").addEventListener("submit", async (event) => {
   event.preventDefault();
-  const option = find(state.option);
+  const option = find(view.pick);
   const pick = { option: option.id, label: label(option), reason: $("#pick-reason").value.trim(), at: new Date().toISOString() };
   try { $("#pick-status").textContent = await CHOICE.submit(pick); } catch (error) { $("#pick-status").textContent = `Pick not saved: ${error.message}`; }
   renderPicks();
 });
 
+// Input
 document.addEventListener("click", (event) => {
-  const el = event.target.closest("[data-opt],[data-theme-btn],[data-act]");
+  const el = event.target.closest("[data-view],[data-theme-btn],[data-opt],[data-side],[data-mode],[data-pick],[data-pick-opt],[data-act]");
   if (!el) return;
-  if (el.dataset.opt) return select(el.dataset.opt);
-  if (el.dataset.themeBtn) return setTheme(el.dataset.themeBtn);
-  const handler = ACTIONS[el.dataset.act];
-  if (!handler) return console.warn(`ui-demo: no ACTIONS.${el.dataset.act}`);
+  const data = el.dataset;
+  if (data.view) return go({ name: data.view });
+  if (data.themeBtn) return setTheme(data.themeBtn);
+  if (data.opt) return go({ option: data.opt });
+  if (data.side) return go({ [data.side]: data.id });
+  if (data.mode) return go({ mode: data.mode });
+  if (data.pick) return choose(data.pick, true);
+  if (data.pickOpt) return choose(data.pickOpt, false);
+  const handler = ACTIONS[data.act];
+  if (!handler) return console.warn(`ui-demo: no ACTIONS.${data.act}`);
   handler(el, event);
-  render();
+  paint();
 });
 document.addEventListener("input", (event) => {
-  const handler = ACTIONS[event.target.dataset?.input];
+  const target = event.target;
+  if (target.classList.contains("reveal")) {
+    view.reveal = Number(target.value);
+    const over = $("#view .scaler.over");
+    if (over) over.style.clipPath = `inset(0 0 0 ${view.reveal}%)`;
+    return;
+  }
+  const handler = ACTIONS[target.dataset && target.dataset.input];
   if (!handler) return;
-  handler(event.target, event);
-  render();
+  handler(target, event);
+  paint();
 });
 document.addEventListener("keydown", (event) => {
   const typing = event.target instanceof Element && event.target.closest("input, textarea, select, [contenteditable]");
   if (event.metaKey || event.ctrlKey || event.altKey || typing) return;
   const option = OPTIONS[Number(event.key) - 1];
-  if (option) select(option.id);
+  if (!option) return;
+  if (view.name === "focus") return go({ option: option.id });
+  if (view.name === "compare") return go({ right: option.id });
+  const target = document.getElementById(`card-all-${option.id}`);
+  if (target) target.scrollIntoView({ block: "start", behavior: motion() });
 });
-
-function fit() {
-  const scale = Math.min(1, $("#stage").clientWidth / DEMO.size.w);
-  $("#scaler").style.transform = `scale(${scale})`;
-  $("#stage").style.height = `${DEMO.size.h * scale}px`;
-}
 
 (function start() {
   const params = new URLSearchParams(location.search);
-  if (find(params.get("option"))) state.option = params.get("option");
+  if (["all", "compare", "focus"].includes(params.get("view"))) view.name = params.get("view");
+  if (["side", "slide"].includes(params.get("mode"))) view.mode = params.get("mode");
+  ["option", "left", "right"].forEach((key) => { if (find(params.get(key))) view[key] = params.get(key); });
+  const real = OPTIONS.filter((o) => o.id !== "today").length;
+  $("#meta").textContent = `${real} designs${find("today") ? " + today" : ""} · drawn at ${DEMO.size.w} × ${DEMO.size.h} · ${DEMO.date}`;
+  $("#last-key").textContent = String(OPTIONS.length);
   $("#themes").hidden = DEMO.themes.length < 2;
-  const preferred = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-  renderSwitcher();
-  setTheme(params.get("theme") || preferred);
-  render();
+  setTheme(params.get("theme") || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
+  build();
   renderPicks();
-  new ResizeObserver(fit).observe($("#stage"));
-  fit();
 })();
 </script>
 </body>
