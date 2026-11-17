@@ -3,8 +3,11 @@
 
 One self-contained HTML file that shows every design at once: all side by side
 with a "How they differ" table, two compared side by side or with a slider, and
-one at a time. Light and dark, each design drawn at the app's window size, and
-a Pick panel. Each option gets an empty render function to fill in by hand.
+one at a time. Every design is a working prototype through an interaction kit
+(data-toggle, data-set, data-bind, data-busy, data-toast), with scenarios, linked
+or separate clicks, and an audit for dead controls. Light and dark, each design
+drawn at the app's window size, and a Pick panel. Each option gets an empty
+render function to fill in by hand.
 """
 import argparse
 import base64
@@ -196,8 +199,9 @@ def main():
 
     stubs = ", ".join(f"render_{option['id']}()" for option in options)
     print(f"wrote {args.out} ({len(page) // 1024} KB, {len(options)} options)")
-    print(f"next: draw {stubs}; fill points, cost and traits in OPTIONS; swap the placeholder tokens for the project's")
-    print(f"done when: grep -c data-todo {args.out} prints 0")
+    print(f"next: draw {stubs} and wire every control with the interaction kit; fill points, cost and traits in OPTIONS;")
+    print("      swap the placeholder tokens for the project's")
+    print(f"done when: grep -c data-todo {args.out} prints 0, and ?audit=1 on the site shows 'Every control works'")
 
 
 if __name__ == "__main__":

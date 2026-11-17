@@ -11,9 +11,10 @@ Mocks up a UI change before any product code is touched, as one demo site with e
 1. Frames one open question and 2 to 4 options that differ in structure or behavior, each with trade-offs and a build cost in hours or days.
 2. Draws every option live, with the project's own tokens, copy and window size, next to screenshots of the screen today in each theme.
 3. Builds one site with three views over the same designs: **All side by side** with a "How they differ" table, **Compare two** side by side or with a slider, and **One at a time**. One click opens the same panel in every design at once.
-4. Opens the site live in the browser pane, and checks every view in light and dark, and at phone width, before anyone sees it.
-5. Lets people choose: a question in the chat for one person, or a private Artifact with shared picks for a team.
-6. Iterates in rounds (`<slug>-r2.html`), then writes the pick down in `<slug>.decision.md` as the build brief.
+4. Makes every design a working prototype with an interaction kit (`data-toggle`, `data-set`, `data-bind`, `data-busy`, `data-toast`): menus, dialogs, tabs, typing, loading and toasts work with no code. Scenarios (Typical, Empty, Error) flip every design at once, and `?audit=1` outlines any control that does nothing.
+5. Opens the site live in the browser pane, and checks every view in light and dark, and at phone width, before anyone sees it.
+6. Lets people choose: a question in the chat for one person, or a private Artifact with shared picks for a team.
+7. Iterates in rounds (`<slug>-r2.html`), then writes the pick down in `<slug>.decision.md` as the build brief.
 
 The site shell and the local server also run on their own:
 

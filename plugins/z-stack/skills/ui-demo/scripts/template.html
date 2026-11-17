@@ -14,7 +14,7 @@
   --ink: #1C1C1C; --secondary: #5F5F63; --faint: #74747A; --accent: #126FD4;
   --line: rgba(28,28,28,.12); --hairline: rgba(28,28,28,.07); --strong: rgba(28,28,28,.24);
   --hover: rgba(28,28,28,.045); --selected: rgba(28,28,28,.075); --track: rgba(28,28,28,.06);
-  --solid: #1C1C1C; --on-solid: #FCFCFC;
+  --solid: #1C1C1C; --on-solid: #FCFCFC; --ok: #1F8A5B; --danger: #D93A3A;
   --win-shadow: 0 0 0 1px rgba(28,28,28,.10), 0 24px 48px -28px rgba(0,0,0,.40);
   --card-shadow: 0 1px 0 rgba(0,0,0,.03), 0 12px 32px -22px rgba(0,0,0,.28);
   --card-shadow-hover: 0 1px 0 rgba(0,0,0,.03), 0 18px 40px -20px rgba(0,0,0,.34);
@@ -29,7 +29,7 @@
   --ink: #F5F5F5; --secondary: #A8A8AE; --faint: #8D8D94; --accent: #1E87F6;
   --line: rgba(245,245,245,.10); --hairline: rgba(245,245,245,.06); --strong: rgba(245,245,245,.22);
   --hover: rgba(245,245,245,.05); --selected: rgba(245,245,245,.09); --track: rgba(245,245,245,.06);
-  --solid: #F5F5F5; --on-solid: #121212;
+  --solid: #F5F5F5; --on-solid: #121212; --ok: #3DD68C; --danger: #FF6369;
   --win-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 48px -28px rgba(0,0,0,.9);
   --card-shadow: 0 0 0 1px rgba(255,255,255,.02), 0 12px 32px -22px rgba(0,0,0,.9);
   --card-shadow-hover: 0 0 0 1px rgba(255,255,255,.04), 0 18px 40px -20px rgba(0,0,0,.95);
@@ -39,7 +39,7 @@
   --ink: #F5F5F5; --secondary: #A8A8AE; --faint: #8D8D94; --accent: #1E87F6;
   --line: rgba(245,245,245,.10); --hairline: rgba(245,245,245,.06); --strong: rgba(245,245,245,.22);
   --hover: rgba(245,245,245,.05); --selected: rgba(245,245,245,.09); --track: rgba(245,245,245,.06);
-  --solid: #F5F5F5; --on-solid: #121212;
+  --solid: #F5F5F5; --on-solid: #121212; --ok: #3DD68C; --danger: #FF6369;
   --win-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 48px -28px rgba(0,0,0,.9);
   --card-shadow: 0 0 0 1px rgba(255,255,255,.02), 0 12px 32px -22px rgba(0,0,0,.9);
   --card-shadow-hover: 0 0 0 1px rgba(255,255,255,.04), 0 18px 40px -20px rgba(0,0,0,.95);
@@ -66,6 +66,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   justify-content: space-between; margin: -12px -16px 0; padding: 10px 16px; background: var(--page-bg);
   background: color-mix(in srgb, var(--page-bg) 86%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(12px);
   backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid var(--hairline); }
+.bar-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .seg { display: inline-flex; flex-wrap: wrap; background: var(--track); border-radius: 16px; padding: 3px; gap: 2px; }
 .seg button { border: 0; background: transparent; color: var(--secondary); font-weight: 500; font-size: 12px;
   padding: 6px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center;
@@ -77,6 +78,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .seg[hidden] { display: none; }
 
 /* Cards: one design each */
+#view { display: grid; gap: 28px; }
 .grid { display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: 20px; align-items: start; }
 .card { display: grid; gap: 12px; align-content: start; background: var(--surface); border: 1px solid var(--hairline);
   border-radius: 16px; padding: 14px 14px 16px; box-shadow: var(--card-shadow); transition: box-shadow var(--normal) var(--ease); }
@@ -98,10 +100,18 @@ button, input, textarea, select { font: inherit; color: inherit; }
   font-weight: 500; cursor: pointer; transition: background var(--fast); }
 .ghost:hover { background: var(--hover); }
 .ghost:active { transform: translateY(1px); }
+.ghost.tiny { padding: 3px 10px; font-size: 12px; margin-left: auto; }
+.pill { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 12px; font-size: 12px;
+  font-weight: 500; cursor: pointer; transition: background var(--fast); }
+.pill:hover { background: var(--hover); }
+.audit { font: 500 11px var(--mono); padding: 5px 10px; border-radius: 999px; color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 14%, transparent); }
+.audit[data-ok="true"] { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+.audit[hidden] { display: none; }
 
 /* The window each design is drawn in, scaled to fit */
 .stage { position: relative; width: 100%; overflow: hidden; border-radius: var(--radius); }
-.scaler { width: var(--win-w); height: var(--win-h); transform-origin: top left; }
+.scaler { position: relative; width: var(--win-w); height: var(--win-h); transform-origin: top left; }
 .stage.slide .scaler { position: absolute; top: 0; left: 0; }
 .win { width: var(--win-w); height: var(--win-h); background: var(--window); border-radius: var(--radius);
   overflow: hidden; display: flex; position: relative; box-shadow: var(--win-shadow); }
@@ -114,6 +124,14 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .slide .tag-l { left: 10px; }
 .slide .tag-r { right: 10px; }
 .reveal { width: 100%; margin: 0; accent-color: var(--accent); }
+
+/* Interaction kit inside the designs */
+.win :is([data-act], [data-toggle], [data-set], [data-busy], [data-toast]) { cursor: pointer; }
+.win .demo-dead { outline: 2px dashed var(--danger); outline-offset: 2px; }
+.demo-toast { position: absolute; left: 50%; bottom: 28px; z-index: 20; transform: translate(-50%, 12px); opacity: 0;
+  pointer-events: none; background: var(--solid); color: var(--on-solid); font: 500 14px/1.3 var(--sans); padding: 10px 16px;
+  border-radius: 10px; box-shadow: 0 12px 32px -12px rgba(0,0,0,.45); transition: opacity var(--normal) var(--ease), transform var(--normal) var(--ease); }
+.demo-toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 /* Compare two */
 .compare, .focus { display: grid; gap: 16px; }
@@ -156,7 +174,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 kbd { font: 500 11px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
 
 @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 760px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .pair { grid-template-columns: minmax(0, 1fr); } .bar { position: static; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
@@ -180,9 +198,18 @@ kbd { font: 500 11px var(--mono); border: 1px solid var(--line); border-bottom-w
       <button type="button" data-view="compare" aria-pressed="false">Compare two</button>
       <button type="button" data-view="focus" aria-pressed="false">One at a time</button>
     </div>
-    <div class="seg" id="themes" role="group" aria-label="Theme">
-      <button type="button" data-theme-btn="dark" aria-pressed="false">Dark</button>
-      <button type="button" data-theme-btn="light" aria-pressed="false">Light</button>
+    <div class="bar-group">
+      <div class="seg" id="scenarios" role="group" aria-label="Scenario" hidden></div>
+      <div class="seg" role="group" aria-label="Clicks">
+        <button type="button" data-linked="on" aria-pressed="true" title="One click shows in every design">Linked</button>
+        <button type="button" data-linked="off" aria-pressed="false" title="Each design keeps its own clicks">Separate</button>
+      </div>
+      <button type="button" class="pill" data-reset title="Put every design back to its starting state">Reset</button>
+      <div class="seg" id="themes" role="group" aria-label="Theme">
+        <button type="button" data-theme-btn="dark" aria-pressed="false">Dark</button>
+        <button type="button" data-theme-btn="light" aria-pressed="false">Light</button>
+      </div>
+      <span class="audit" id="audit" role="status" hidden></span>
     </div>
   </nav>
 
@@ -199,7 +226,7 @@ kbd { font: 500 11px var(--mono); border: 1px solid var(--line); border-bottom-w
     <ol id="pick-list" aria-label="Picks so far"></ol>
   </section>
 
-  <p class="hint">Keys <kbd>1</kbd> to <kbd id="last-key">4</kbd>: jump to a design, set the right side in Compare, or switch in One at a time. Sample data only.</p>
+  <p class="hint">Every design works: click, type, open menus. <kbd>Esc</kbd> closes menus and dialogs. Keys <kbd>1</kbd> to <kbd id="last-key">4</kbd>: jump to a design, set the right side in Compare, or switch in One at a time. Sample data only.</p>
 </main>
 
 <script>
@@ -213,13 +240,25 @@ const DEMO = {{DEMO_JSON}};
 //           e.g. { "Where pages live": "Sidebar", "Steps to connect": "2" }. They fill "How they differ".
 const OPTIONS = {{OPTIONS_JSON}};
 
-// State the options read. Each design is on the page more than once, and one change shows in all of
-// them, so people can open the same panel in every design at once.
-const state = {};
+// State the designs read. Set starting values here: Object.assign(state, { page: "General", sw: { login: true } }).
+// Linked (the default) shares it across every design, so one click shows in all of them; Separate gives each its own.
+let state = {};
 
-// Handlers for `data-act="name"` (click) and `data-input="name"` (typing) inside a design.
-// Each runs, then every design re-renders. Example: ACTIONS.toggle = () => { state.open = !state.open; };
-// Don't put `id`s inside designs: they appear several times. Use classes and data-* instead.
+// Named states the bar flips every design into at once, each a patch over the starting state. Optional.
+// e.g. { "Typical": {}, "Empty": { apps: [] }, "Error": { error: "Couldn't reach the server" } }
+const SCENARIOS = {};
+
+// Interaction kit: most controls need no code (z-stack:ui-demo step 4).
+//   data-toggle="sw.login"      flips a value: switches, checkboxes, expanders
+//   data-set="page=Usage;menu="  sets values, empty clears: tabs, nav, menu items, radios
+//   data-bind="query"           keeps a value in step with an input, select or checkbox
+//   data-busy="sync"            "busy", then "done" a moment later: Check now, Connect, Send
+//   data-toast="Saved"          a toast in that window (after busy, when both are set)
+//   data-static                 looks clickable, meant to do nothing
+//   data-act="name"             runs ACTIONS.name(el, event) for anything else
+// state.menu holds the open menu and state.dialog the open dialog: Esc closes both, a click elsewhere closes the menu.
+// Every design re-renders after each change, updating the page in place, so transitions run and scroll stays put.
+// Don't put `id`s inside designs: each design is on the page more than once. Use classes and data-*.
 const ACTIONS = {};
 {{BASELINE_JS}}
 // ---- Designs: one function per option, returning the whole window's HTML ----
@@ -267,7 +306,202 @@ const view = {
   left: LEFT,
   right: (OPTIONS.find((o) => o.recommended && o.id !== LEFT) || OPTIONS.find((o) => o.id !== LEFT)).id,
   pick: (OPTIONS.find((o) => o.recommended) || OPTIONS.find((o) => o.id !== "today")).id,
+  linked: true, scenario: Object.keys(SCENARIOS)[0] || null, audit: false,
 };
+
+// ---- Interaction kit ----
+const KIT = "[data-act],[data-toggle],[data-set],[data-bind],[data-input],[data-busy],[data-toast],[data-static]";
+const CONTROL = "button, a[href], input, select, textarea, summary, [role=button], [role=switch], [role=tab], [role=menuitem], [role=checkbox], [role=radio], [role=option], [tabindex]";
+const NATIVE = "button, a, input, select, textarea, summary";
+const BUSY_MS = 900;
+const TOAST_MS = 1800;
+const clone = (value) => { try { return structuredClone(value); } catch { return JSON.parse(JSON.stringify(value)); } };
+const getPath = (object, path) => path.split(".").reduce((node, key) => (node == null ? undefined : node[key]), object);
+function setPath(object, path, value) {
+  const keys = path.split(".");
+  const last = keys.pop();
+  const parent = keys.reduce((node, key) => (node[key] && typeof node[key] === "object" ? node[key] : (node[key] = {})), object);
+  parent[last] = value;
+}
+const parseValue = (text) => (text === "" || text === "null" ? null : text === "true" ? true : text === "false" ? false : text);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Linked: every design reads `shared`. Separate: each window gets its own copy, made on first use.
+const START = clone(state);
+const shared = state;
+const own = new Map();
+function stateFor(win) {
+  if (view.linked) return shared;
+  const key = `${win.dataset.slot}:${win.dataset.option}`;
+  if (!own.has(key)) own.set(key, clone(shared));
+  return own.get(key);
+}
+function within(win, fn) {
+  const outer = state;
+  state = stateFor(win);
+  try { return fn(); } finally { state = outer; }
+}
+
+// Update a window in place, so CSS transitions run and scroll, focus and typing survive a re-render.
+function morph(target, html) {
+  const next = document.createElement("template");
+  next.innerHTML = html;
+  patchChildren(target, next.content);
+}
+function patchChildren(parent, source) {
+  const before = [...parent.childNodes];
+  const after = [...source.childNodes];
+  after.forEach((node, i) => (before[i] ? patchNode(before[i], node) : parent.appendChild(node)));
+  before.slice(after.length).forEach((node) => node.remove());
+}
+function patchNode(current, next) {
+  if (current.nodeType !== next.nodeType || current.nodeName !== next.nodeName) return current.replaceWith(next);
+  if (current.nodeType !== Node.ELEMENT_NODE) {
+    if (current.nodeValue !== next.nodeValue) current.nodeValue = next.nodeValue;
+    return;
+  }
+  [...current.attributes].forEach(({ name }) => { if (!next.hasAttribute(name)) current.removeAttribute(name); });
+  [...next.attributes].forEach(({ name, value }) => { if (current.getAttribute(name) !== value) current.setAttribute(name, value); });
+  if (current.tagName !== "TEXTAREA") patchChildren(current, next);
+  syncFormValue(current, next);
+}
+function syncFormValue(current, next) {
+  if (current === document.activeElement) return;
+  if (current.tagName === "INPUT") {
+    if (current.type === "checkbox" || current.type === "radio") current.checked = next.hasAttribute("checked");
+    else if (current.value !== (next.getAttribute("value") ?? "")) current.value = next.getAttribute("value") ?? "";
+  } else if (current.tagName === "TEXTAREA") {
+    if (current.value !== next.textContent) current.value = next.textContent;
+  } else if (current.tagName === "SELECT") {
+    const chosen = [...current.options].findIndex((option) => option.hasAttribute("selected"));
+    if (chosen >= 0) current.selectedIndex = chosen;
+  }
+}
+
+function runKit(el, win, event) {
+  const data = el.dataset;
+  within(win, () => {
+    if (data.set) {
+      data.set.split(";").forEach((pair) => {
+        const at = pair.indexOf("=");
+        if (at > 0) setPath(state, pair.slice(0, at).trim(), parseValue(pair.slice(at + 1).trim()));
+      });
+    }
+    if (data.toggle) setPath(state, data.toggle, !getPath(state, data.toggle));
+    if (data.act) {
+      const handler = ACTIONS[data.act];
+      if (handler) handler(el, event);
+      else console.warn(`ui-demo: no ACTIONS.${data.act}`);
+    }
+  });
+  paint();
+  if (data.busy) return busy(win, data.busy, data.toast);
+  if (data.toast) toast(win, data.toast);
+}
+
+async function busy(win, path, message) {
+  within(win, () => setPath(state, path, "busy"));
+  paint();
+  await sleep(BUSY_MS);
+  within(win, () => setPath(state, path, "done"));
+  paint();
+  if (message) toast(win, message);
+}
+
+const toastTimers = new WeakMap();
+function toast(win, message) {
+  const host = win.parentElement;
+  let el = host.querySelector(":scope > .demo-toast");
+  if (!el) {
+    el = document.createElement("div");
+    el.className = "demo-toast";
+    el.setAttribute("role", "status");
+    host.appendChild(el);
+  }
+  el.textContent = message;
+  el.classList.remove("show");
+  void el.offsetWidth;
+  el.classList.add("show");
+  clearTimeout(toastTimers.get(el));
+  toastTimers.set(el, setTimeout(() => el.classList.remove("show"), TOAST_MS));
+}
+
+function dismiss() {
+  const close = (s) => {
+    const open = Boolean(s.menu || s.dialog);
+    if (s.menu) s.menu = null;
+    if (s.dialog) s.dialog = null;
+    return open;
+  };
+  let changed = close(shared);
+  own.forEach((s) => { changed = close(s) || changed; });
+  if (changed) paint();
+}
+
+function clickInWindow(event, win) {
+  if (event.target.closest("a[href]")) event.preventDefault();
+  const el = event.target.closest(KIT);
+  if (el && win.contains(el)) {
+    const data = el.dataset;
+    if (data.set || data.toggle || data.act || data.busy || data.toast) runKit(el, win, event);
+    return;
+  }
+  if (within(win, () => state.menu)) {
+    within(win, () => { state.menu = null; });
+    paint();
+  }
+}
+
+// Controls that look clickable but do nothing: every one is a dead end in a prototype.
+function audit(mark) {
+  const dead = [];
+  document.querySelectorAll("#view .demo-dead").forEach((el) => el.classList.remove("demo-dead"));
+  document.querySelectorAll("#view .win").forEach((win) => {
+    win.querySelectorAll("*").forEach((el) => {
+      const pointer = getComputedStyle(el).cursor === "pointer" && getComputedStyle(el.parentElement).cursor !== "pointer";
+      if (!el.matches(CONTROL) && !pointer) return;
+      const wired = el.closest(KIT);
+      if (wired && win.contains(wired)) return;
+      const what = (el.getAttribute("aria-label") || el.textContent || el.tagName.toLowerCase()).trim().replace(/\s+/g, " ").slice(0, 48);
+      dead.push({ design: win.dataset.option, what });
+      if (mark) el.classList.add("demo-dead");
+    });
+  });
+  return dead;
+}
+function showAudit() {
+  const dead = audit(true);
+  const badge = $("#audit");
+  badge.hidden = false;
+  badge.dataset.ok = String(dead.length === 0);
+  badge.textContent = dead.length ? `${dead.length} dead ${dead.length === 1 ? "control" : "controls"}` : "Every control works";
+  badge.title = dead.map((d) => `${d.design.toUpperCase()}: ${d.what}`).join("\n");
+}
+window.uiDemo = { audit: () => audit(false) };
+
+function renderScenarios() {
+  const names = Object.keys(SCENARIOS);
+  $("#scenarios").hidden = !names.length;
+  $("#scenarios").innerHTML = names.map((name) =>
+    `<button type="button" data-scenario="${esc(name)}" aria-pressed="${name === view.scenario}">${esc(name)}</button>`).join("");
+}
+function applyScenario(name) {
+  view.scenario = name in SCENARIOS ? name : null;
+  const base = Object.assign(clone(START), clone(view.scenario ? SCENARIOS[view.scenario] : {}));
+  Object.keys(shared).forEach((key) => delete shared[key]);
+  Object.assign(shared, base);
+  own.clear();
+  renderScenarios();
+  paint();
+  syncUrl();
+}
+function setLinked(on) {
+  view.linked = on;
+  own.clear();
+  document.querySelectorAll("[data-linked]").forEach((button) => button.setAttribute("aria-pressed", String((button.dataset.linked === "on") === on)));
+  paint();
+  syncUrl();
+}
 
 // Pieces
 const stage = (id, slot) =>
@@ -275,7 +509,8 @@ const stage = (id, slot) =>
 const pickButton = (option) => `<button type="button" class="ghost" data-pick="${option.id}">${esc(pickLabel(option))}</button>`;
 function head(option) {
   return `<header class="card-head"><span class="letter">${short(option)}</span><h2>${esc(option.name)}</h2>${
-    option.recommended ? '<span class="chip accent">Recommended</span>' : ""}</header>`;
+    option.recommended ? '<span class="chip accent">Recommended</span>' : ""}${view.name === "focus" ? "" :
+    `<button type="button" class="ghost tiny" data-try="${option.id}" aria-label="Try ${esc(label(option))} full size">Full size</button>`}</header>`;
 }
 function about(option) {
   const today = option.id === "today";
@@ -357,16 +592,9 @@ function fitStage(element) {
 const sizer = new ResizeObserver((entries) => entries.forEach((entry) => fitStage(entry.target)));
 
 function paint() {
-  const active = document.activeElement;
-  const from = active && active.closest ? active.closest(".win") : null;
-  const keep = from && active.dataset.input
-    ? { option: from.dataset.option, slot: from.dataset.slot, input: active.dataset.input, caret: active.selectionStart ?? null } : null;
-  document.querySelectorAll("#view .win[data-option]").forEach((win) => { win.innerHTML = RENDER[win.dataset.option](); });
-  if (!keep) return;
-  const again = $(`#view .win[data-option="${keep.option}"][data-slot="${keep.slot}"] [data-input="${CSS.escape(keep.input)}"]`);
-  if (!again) return;
-  again.focus();
-  if (keep.caret !== null && again.setSelectionRange) again.setSelectionRange(keep.caret, keep.caret);
+  document.querySelectorAll("#view .win[data-option]").forEach((win) =>
+    within(win, () => morph(win, RENDER[win.dataset.option]())));
+  if (view.audit) showAudit();
 }
 
 function build() {
@@ -402,6 +630,9 @@ function syncUrl() {
       left: view.name === "compare" ? view.left : null,
       right: view.name === "compare" ? view.right : null,
       mode: view.name === "compare" ? view.mode : null,
+      scenario: view.scenario,
+      linked: view.linked ? null : "0",
+      audit: view.audit ? "1" : null,
     };
     Object.entries(params).forEach(([key, value]) => (value ? url.searchParams.set(key, value) : url.searchParams.delete(key)));
     history.replaceState(null, "", url);
@@ -444,7 +675,9 @@ $("#pick-form").addEventListener("submit", async (event) => {
 
 // Input
 document.addEventListener("click", (event) => {
-  const el = event.target.closest("[data-view],[data-theme-btn],[data-opt],[data-side],[data-mode],[data-pick],[data-pick-opt],[data-act]");
+  const win = event.target.closest("#view .win");
+  if (win) return clickInWindow(event, win);
+  const el = event.target.closest("[data-view],[data-theme-btn],[data-opt],[data-side],[data-mode],[data-pick],[data-pick-opt],[data-try],[data-linked],[data-scenario],[data-reset]");
   if (!el) return;
   const data = el.dataset;
   if (data.view) return go({ name: data.view });
@@ -454,10 +687,16 @@ document.addEventListener("click", (event) => {
   if (data.mode) return go({ mode: data.mode });
   if (data.pick) return choose(data.pick, true);
   if (data.pickOpt) return choose(data.pickOpt, false);
-  const handler = ACTIONS[data.act];
-  if (!handler) return console.warn(`ui-demo: no ACTIONS.${data.act}`);
-  handler(el, event);
-  paint();
+  if (data.linked) return setLinked(data.linked === "on");
+  if (data.scenario !== undefined) return applyScenario(data.scenario);
+  if (data.reset !== undefined) return applyScenario(view.scenario);
+  if (data.try) {
+    go({ name: "focus", option: data.try });
+    $("#view").scrollIntoView({ block: "start", behavior: motion() });
+  }
+});
+document.addEventListener("submit", (event) => {
+  if (event.target.closest("#view .win")) event.preventDefault();
 });
 document.addEventListener("input", (event) => {
   const target = event.target;
@@ -467,13 +706,25 @@ document.addEventListener("input", (event) => {
     if (over) over.style.clipPath = `inset(0 0 0 ${view.reveal}%)`;
     return;
   }
-  const handler = ACTIONS[target.dataset && target.dataset.input];
+  const win = target.closest("#view .win");
+  if (!win) return;
+  if (target.dataset.bind) {
+    within(win, () => setPath(state, target.dataset.bind, target.type === "checkbox" ? target.checked : target.value));
+    return paint();
+  }
+  const handler = ACTIONS[target.dataset.input];
   if (!handler) return;
-  handler(target, event);
+  within(win, () => handler(target, event));
   paint();
 });
 document.addEventListener("keydown", (event) => {
-  const typing = event.target instanceof Element && event.target.closest("input, textarea, select, [contenteditable]");
+  if (event.key === "Escape") return dismiss();
+  const el = event.target instanceof Element ? event.target : null;
+  if (el && (event.key === "Enter" || event.key === " ") && el.closest("#view .win") && el.matches(KIT) && !el.matches(NATIVE)) {
+    event.preventDefault();
+    return el.click();
+  }
+  const typing = el && el.closest("input, textarea, select, [contenteditable]");
   if (event.metaKey || event.ctrlKey || event.altKey || typing) return;
   const option = OPTIONS[Number(event.key) - 1];
   if (!option) return;
@@ -488,11 +739,16 @@ document.addEventListener("keydown", (event) => {
   if (["all", "compare", "focus"].includes(params.get("view"))) view.name = params.get("view");
   if (["side", "slide"].includes(params.get("mode"))) view.mode = params.get("mode");
   ["option", "left", "right"].forEach((key) => { if (find(params.get(key))) view[key] = params.get(key); });
+  if (params.get("scenario") in SCENARIOS) view.scenario = params.get("scenario");
+  view.audit = params.get("audit") === "1";
+  if (params.get("linked") === "0") setLinked(false);
   const real = OPTIONS.filter((o) => o.id !== "today").length;
   $("#meta").textContent = `${real} designs${find("today") ? " + today" : ""} · drawn at ${DEMO.size.w} × ${DEMO.size.h} · ${DEMO.date}`;
   $("#last-key").textContent = String(OPTIONS.length);
   $("#themes").hidden = DEMO.themes.length < 2;
   setTheme(params.get("theme") || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
+  if (view.scenario) applyScenario(view.scenario);
+  renderScenarios();
   build();
   renderPicks();
 })();
