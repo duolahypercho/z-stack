@@ -59,10 +59,16 @@ Puts proof on a pull request, so a reviewer can trust it without checking out th
 
 The images go on an orphan branch, `z-stack-evidence`, one folder per PR, so the PR branch never carries them. The skill then writes an `## Evidence` section for the PR body.
 
+With no PR yet, it makes the evidence first and opens the PR last, so the PR never shows up without its proof. Before the PR exists, the folder is named after the branch (`branch-<name>`).
+
 ```bash
 python3 plugins/z-stack/skills/pr-evidence/scripts/chart.py metrics.json --out ./.evidence/pr-42
 python3 plugins/z-stack/skills/pr-evidence/scripts/publish.py --dir ./.evidence/pr-42 --pr 42
 python3 plugins/z-stack/skills/pr-evidence/scripts/section.py --dir ./.evidence/pr-42 --pr 42 > evidence.md
+
+# No PR yet: leave out --pr, then open the PR with the section in its body
+python3 plugins/z-stack/skills/pr-evidence/scripts/publish.py --dir ./.evidence/new
+python3 plugins/z-stack/skills/pr-evidence/scripts/section.py --dir ./.evidence/new > evidence.md
 ```
 
 `metrics.json` holds the raw samples and the command that made them. See the skill for the format.

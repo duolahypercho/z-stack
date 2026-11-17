@@ -2,6 +2,7 @@
 """Print the PR's ## Evidence markdown from an evidence folder, with images on the z-stack-evidence branch."""
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -13,6 +14,20 @@ def repo_slug():
     out = subprocess.run(["gh", "repo", "view", "--json", "nameWithOwner"],
                          check=True, text=True, capture_output=True).stdout
     return json.loads(out)["nameWithOwner"]
+
+
+def evidence_key(pr, branch):
+    """pr-<n> once the PR exists, branch-<name> before it does. Pass the flags publish.py got."""
+    if pr is not None:
+        if pr <= 0:
+            raise ValueError("--pr must be a positive number")
+        return f"pr-{pr}"
+    name = branch or subprocess.run(["git", "branch", "--show-current"],
+                                    check=True, text=True, capture_output=True).stdout.strip()
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-.")
+    if not slug:
+        raise ValueError("No PR and no branch checked out: pass --pr <n> or --branch <name>")
+    return f"branch-{slug}"
 
 
 def screenshots(folder, url):
@@ -47,14 +62,16 @@ def charts(folder, url):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dir", required=True, type=Path)
-    parser.add_argument("--pr", required=True, type=int)
+    parser.add_argument("--pr", type=int, help="the PR number, once the PR exists")
+    parser.add_argument("--branch", help="before the PR exists: its head branch (default: the current branch)")
     parser.add_argument("--repo", help="owner/name; defaults to the current repository")
     args = parser.parse_args()
     folder = args.dir.resolve()
     try:
-        url = f"https://github.com/{args.repo or repo_slug()}/raw/{BRANCH}/pr-{args.pr}/"
+        key = evidence_key(args.pr, args.branch)
+        url = f"https://github.com/{args.repo or repo_slug()}/raw/{BRANCH}/{key}/"
         body = screenshots(folder, url) + charts(folder, url)
-    except (subprocess.CalledProcessError, json.JSONDecodeError, KeyError) as error:
+    except (subprocess.CalledProcessError, json.JSONDecodeError, KeyError, ValueError) as error:
         parser.error(str(error))
     if not body:
         parser.error(f"{folder} has neither manifest.json (screenshots) nor metrics.summary.json (charts)")
