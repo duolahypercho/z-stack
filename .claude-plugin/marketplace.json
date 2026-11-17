@@ -7,7 +7,7 @@
       "name": "z-stack",
       "source": "./plugins/z-stack",
       "description": "Proof-first workflows. z-stack:ui-demo builds one demo site with every design option side by side, each a working prototype, to pick from before building; z-stack:evidence captures before and after screenshots; z-stack:pr-evidence puts screenshots or charts from real measurements on a pull request.",
-      "version": "0.5.0"
+      "version": "0.5.1"
     }
   ]
 }

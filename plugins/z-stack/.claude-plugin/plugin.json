@@ -1,6 +1,6 @@
 {
   "name": "z-stack",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Proof-first agent workflows. Show the options before building, then show the change, don't describe it.",
   "author": { "name": "duola" },
   "keywords": ["z-stack", "evidence", "screenshots", "before-after", "verification", "ui-demo", "design-options", "mockups"]

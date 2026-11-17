@@ -1,6 +1,6 @@
 ---
 name: pr-evidence
-description: "Put proof on a pull request: before and after screenshots for a visible change, or charts drawn from real measurements (timings, sizes, memory, test counts) for one you can't see. Hosts the images on an evidence branch and writes an Evidence section for the PR body or a comment. Use for /z-stack:pr-evidence, \"add evidence to the PR\", \"prove this PR\", \"show the numbers\", or before asking for review on a PR."
+description: "Put proof on a pull request: before and after screenshots for a visible change, or charts drawn from real measurements (timings, sizes, memory, test counts) for one you can't see. Hosts the images on an evidence branch and writes an Evidence section for the PR body or a comment; with no PR yet, makes the evidence first and opens the PR with it already in the body. Use for /z-stack:pr-evidence, \"add evidence to the PR\", \"prove this PR\", \"show the numbers\", \"open a PR with screenshots\", or before asking for review on a PR."
 ---
 
 # z-stack:pr-evidence
@@ -14,7 +14,9 @@ The section ends up with one of two kinds of proof, or both:
 
 ## 1. Read the PR
 
-1. Find the PR: `gh pr view --json number,url,baseRefName,headRefName,title,body`. No PR yet? Use the current branch against the main branch, and write the section so it can go into the PR description later.
+1. Find the PR: `gh pr view --json number,url,baseRefName,headRefName,title,body`.
+   - **No PR yet**, including when the person asked you to open one: make the evidence first and open the PR last, with the Evidence section already in its body (step 5). Compare the current branch against the main branch. Say once, up front, that the PR opens after the evidence and about how long that takes (for screenshots: two builds plus the captures).
+   - Never open a PR with a placeholder such as "Evidence coming in a follow-up edit". A reviewer who opens it early sees no proof, and if the session stops the placeholder stays.
 2. `git diff --stat <base>...HEAD`. List what changed for a reviewer, as a person would put it.
 3. Decide what kind of proof each change needs:
 
@@ -69,28 +71,33 @@ python3 <this skill's base directory>/scripts/chart.py metrics.json --out <folde
 GitHub has no API for attaching images to a PR, so the images go on a branch of their own.
 
 ```bash
-python3 <this skill's base directory>/scripts/publish.py --dir <folder> --pr <number>
+python3 <this skill's base directory>/scripts/publish.py --dir <folder> --pr <number>   # the PR exists
+python3 <this skill's base directory>/scripts/publish.py --dir <folder>                 # no PR yet
 ```
 
-It copies the folder to `z-stack-evidence/pr-<number>/` on an orphan branch named `z-stack-evidence` (made on first use, never merged), pushes that branch, and prints the image URLs. It never touches the PR branch or the working tree. Each run replaces that PR's folder.
+It copies the folder onto an orphan branch named `z-stack-evidence` (made on first use, never merged), pushes that branch, and prints the image URLs. The folder is `pr-<number>/`, or `branch-<name>/` without `--pr` (the current branch; `--branch` names another). It never touches the PR branch or the working tree. Each run replaces that folder.
 
-Pushing is outward-facing. The person asking for PR evidence approves the push of the evidence branch. Ask first when the repository is public and the screenshots could show anything beyond synthetic data.
+Keep the same key for every later run on this PR, even after it opens: pass the same flags to `publish.py` and `section.py`, so the links already in the body keep working.
+
+Pushing is outward-facing. Asking for PR evidence, or for a PR made with this skill, is the go-ahead to push the evidence branch and put the section on the PR; don't ask again. Ask first only when the repository is public and the screenshots could show anything beyond synthetic data. Look at every image before it's pushed.
 
 ## 5. Write the Evidence section
 
 ```bash
-python3 <this skill's base directory>/scripts/section.py --dir <folder> --pr <number> > evidence.md
+python3 <this skill's base directory>/scripts/section.py --dir <folder> [--pr <number>] > evidence.md
 ```
 
-It builds the markdown from the folder: a before | after table per screenshot pair with its note and changed pixels, each chart with its table, and how each number was measured (command and machine). Then add, in your own words at the top:
+Pass the same `--pr` or `--branch` that `publish.py` got. It builds the markdown from the folder: a before | after table per screenshot pair with its note and changed pixels, each chart with its table, and how each number was measured (command and machine). Then add, in your own words at the top:
 
 - **What this shows**: one line per change.
-- **Not shown**: what the evidence doesn't cover (other sizes, real accounts, a slower machine, interaction).
+- **Not shown**: what the evidence doesn't cover (other sizes, real accounts, a slower machine, interaction). When a side couldn't be built or measured, say so here and why. A reason is fine; a promise to add it later isn't.
+
+`grep -c '_fill in_' evidence.md` prints 0 before it goes anywhere.
 
 Then deliver it:
-- Show the person the section and the most telling image or chart first.
-- With their go-ahead, put it on the PR. Either replace a previous `## Evidence` section in the body (`gh pr edit <n> --body-file`, keeping the rest of the body exactly as it was) or post it as a comment (`gh pr comment <n> --body-file evidence.md`). Prefer the body. Use a comment when the body belongs to someone else.
-- Reply with the PR link and the table of results.
+- **No PR yet:** push the PR branch, then open the PR once with everything in it: `gh pr create --base <base> --title "<title>" --body-file body.md`, where `body.md` is the summary and test plan followed by `evidence.md`. Open it only after `publish.py` has pushed, so the images load the moment it exists.
+- **The PR exists:** replace its `## Evidence` section, placeholder or older evidence alike (`gh pr edit <n> --body-file`, keeping the rest of the body exactly as it was). No section yet: add it after the test plan. Use a comment instead (`gh pr comment <n> --body-file evidence.md`) when the body belongs to someone else.
+- Reply with the PR link, the most telling image or chart, and the table of results.
 
 ## Rules
 
@@ -98,3 +105,4 @@ Then deliver it:
 - Every chart has its command and machine in the section. A number with no way to reproduce it doesn't go in.
 - A regression is shown as plainly as a win. Never leave out a metric because it got worse.
 - No personal data in a screenshot or a sample: synthetic accounts, fixture content, no real tabs, mail or files.
+- A PR made with this skill opens once, with its evidence in the body. No placeholder sections, no "screenshots to follow".
